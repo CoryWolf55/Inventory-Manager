@@ -1,0 +1,14 @@
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\bin\Debug\Inventory Manager.exe.config
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\bin\Debug\Inventory Manager.exe
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\bin\Debug\Inventory Manager.pdb
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory Manager.csproj.AssemblyReference.cache
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory_Manager.Form1.resources
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory_Manager.Properties.Resources.resources
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory Manager.csproj.GenerateResource.cache
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory Manager.csproj.CoreCompileInputs.cache
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory Manager.exe
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory Manager.pdb
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory Manager.exe.config
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory_Manager.Remove_Stock.resources
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory_Manager.Add_Recipe.resources
+C:\Users\Cory\source\repos\Inventory Manager\Inventory Manager\obj\Debug\Inventory_Manager.Add_Stock.resources
