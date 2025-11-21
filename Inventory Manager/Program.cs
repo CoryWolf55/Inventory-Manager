@@ -45,6 +45,46 @@ namespace Inventory_Manager
         public string Unit { get; set; }
     }
 
+    public class Menu
+    {
+        public List<string> recipeNames = new List<string>();
+
+        public void InitMenu()
+        {
+
+            //wwww
+
+
+        }
+        // DateTime date = DateTime.Now;
+        //int dateAsInt = int.Parse(date.ToString("yyyyMMdd"));
+    }
+
+    public class Schedule
+    {
+        //Where I can list breakfast, lunch, or dinner
+        public Dictionary<int, string> times = new Dictionary<int, string>
+        {
+            {1,"Breakfast"},
+            {2,"Lunch"},
+            {3,"Dinner"},
+            {4,"Dessert"},
+        };
+        //a schedule consists of the menu and the time it is set
+        public Dictionary<Menu, Dictionary<int,string>> schedules
+        = new Dictionary<Menu, Dictionary<int, string>>();
+
+
+    }
+
+    public class MenuManager
+    {
+        public static readonly MenuManager Instance = new MenuManager();
+        
+    }
+
+    
+
     public class Recipe
     {
         public string Name { get; set; }

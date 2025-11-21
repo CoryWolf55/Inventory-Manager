@@ -84,7 +84,7 @@
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(348, 502);
             this.dataGridView1.TabIndex = 3;
-            
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // Name
             // 
@@ -193,7 +193,6 @@
             this.Controls.Add(this.SubmitButton);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label1);
-            //this.Name = "Add_Recipe";
             this.Text = "Add_Recipe";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.panel1.ResumeLayout(false);

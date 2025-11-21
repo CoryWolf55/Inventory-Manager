@@ -60,5 +60,12 @@ namespace Inventory_Manager
         {
 
         }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            //Menu Button
+            Menu_Form newForm = new Menu_Form();
+            newForm.Show();
+        }
     }
 }
