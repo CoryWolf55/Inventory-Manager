@@ -16,6 +16,17 @@ namespace Inventory_Manager
     {
         //Main lists used throughout the program
         public static List<Recipe> recipes { get; set; } = new List<Recipe>();
+        public static Dictionary<DateTime, Menu> scheduleMenu { get; set; } = 
+            new Dictionary<DateTime, Menu>();
+        public static Dictionary<int, string> eatingTimes { get; set; } = new Dictionary<int, string>
+        {
+            {1,"Breakfast"},
+            {2,"Lunch"},
+            {3,"Dinner"},
+            {4,"Dessert"},
+        };
+
+
         public static List<InventoryItem> inventory { get; set; } = new List<InventoryItem>();
         public readonly static string[] units = new[] { "g", "kg", "oz", "lb", "ml", "l", "pcs" };
 
@@ -47,40 +58,78 @@ namespace Inventory_Manager
 
     public class Menu
     {
+        //The whole menu of names
         public List<string> recipeNames = new List<string>();
-
-        public void InitMenu()
+        public int dateAsInt;
+        //constructor for init
+        public Menu() 
         {
+            Init();
 
-            //wwww
 
+        }
 
+        //Const for if there is a time
+        public Menu(DateTime time)
+        {
+            Init();
+            dateAsInt = int.Parse(time.ToString("yyyyMMdd"));
+        }
+
+        private void Init()
+        {
+            foreach (Recipe recipe in Program.recipes)
+            {
+                string name = recipe.Name;
+                recipeNames.Add(name);
+            }
         }
         // DateTime date = DateTime.Now;
         //int dateAsInt = int.Parse(date.ToString("yyyyMMdd"));
     }
 
-    public class Schedule
+    public class MenuSection : Menu
     {
-        //Where I can list breakfast, lunch, or dinner
-        public Dictionary<int, string> times = new Dictionary<int, string>
+        public int sectionTime = 0;
+        //The names split into its section
+        public List<string> sectionRecipeNames = new List<string>();
+
+        public MenuSection(int sectionTime, List<string> recipes) : base()
         {
-            {1,"Breakfast"},
-            {2,"Lunch"},
-            {3,"Dinner"},
-            {4,"Dessert"},
-        };
-        //a schedule consists of the menu and the time it is set
-        public Dictionary<Menu, Dictionary<int,string>> schedules
-        = new Dictionary<Menu, Dictionary<int, string>>();
-
-
+            this.sectionTime = sectionTime;
+            this.sectionRecipeNames = recipes;
+        }
     }
+
+    //Schedule has key for dates and the menu that corresponds.
+    //Menu will contain the eating times if applied
 
     public class MenuManager
     {
         public static readonly MenuManager Instance = new MenuManager();
-        
+        /* Summary
+         * User clicks date, text box shows the menu
+         * if menu is empty it creates a new one. 
+         * The user can select the recipes they want to add
+         * 
+         */
+        public void SelectedDate(DateTime date)
+        {
+            Menu selectedMenu = null;
+            //Check if there is already a menu on that day
+            if (Program.scheduleMenu[date] != null)
+            {
+                //Has menu
+                selectedMenu = Program.scheduleMenu[date];
+            }
+            else
+            {
+                selectedMenu = new Menu(date);
+            }
+
+            //Create the sections for that menu
+
+        }
     }
 
     

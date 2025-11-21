@@ -25,7 +25,12 @@ namespace Inventory_Manager
         private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
         {
             //Where the change happens
+            DateTime selectedDate = e.Start;
+
+            MenuManager.Instance.SelectedDate(selectedDate);
         }
+
+       
     }
 
 }
