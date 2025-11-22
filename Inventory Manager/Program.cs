@@ -6,8 +6,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.AccessControl;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Collections.Specialized.BitVector32;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Inventory_Manager
@@ -58,47 +61,20 @@ namespace Inventory_Manager
 
     public class Menu
     {
-        //The whole menu of names
-        public List<string> recipeNames = new List<string>();
+        public Dictionary<int, MenuSection> sections = new Dictionary<int, MenuSection>();
         public int dateAsInt;
-        //constructor for init
-        public Menu() 
-        {
-            Init();
 
-
-        }
-
-        //Const for if there is a time
         public Menu(DateTime time)
         {
-            Init();
             dateAsInt = int.Parse(time.ToString("yyyyMMdd"));
         }
-
-        private void Init()
-        {
-            foreach (Recipe recipe in Program.recipes)
-            {
-                string name = recipe.Name;
-                recipeNames.Add(name);
-            }
-        }
-        // DateTime date = DateTime.Now;
-        //int dateAsInt = int.Parse(date.ToString("yyyyMMdd"));
     }
 
-    public class MenuSection : Menu
+
+    public class MenuSection
     {
-        public int sectionTime = 0;
-        //The names split into its section
         public List<string> sectionRecipeNames = new List<string>();
 
-        public MenuSection(int sectionTime, List<string> recipes) : base()
-        {
-            this.sectionTime = sectionTime;
-            this.sectionRecipeNames = recipes;
-        }
     }
 
     //Schedule has key for dates and the menu that corresponds.
@@ -107,32 +83,47 @@ namespace Inventory_Manager
     public class MenuManager
     {
         public static readonly MenuManager Instance = new MenuManager();
-        /* Summary
-         * User clicks date, text box shows the menu
-         * if menu is empty it creates a new one. 
-         * The user can select the recipes they want to add
-         * 
-         */
+        public static Menu selectedMenu = null;
+
         public void SelectedDate(DateTime date)
         {
-            Menu selectedMenu = null;
-            //Check if there is already a menu on that day
-            if (Program.scheduleMenu[date] != null)
-            {
-                //Has menu
-                selectedMenu = Program.scheduleMenu[date];
-            }
-            else
+            if (!Program.scheduleMenu.TryGetValue(date, out selectedMenu))
             {
                 selectedMenu = new Menu(date);
+                Program.scheduleMenu[date] = selectedMenu;
+            }
+        }
+
+        public void AddToSection(int sectionNum, string recipeName)
+        {
+            if (selectedMenu == null)
+                throw new InvalidOperationException("No menu selected. Call SelectedDate() first.");
+
+            if (!Program.eatingTimes.ContainsKey(sectionNum)) return;
+
+            if (!selectedMenu.sections.TryGetValue(sectionNum, out var section))
+            {
+                section = new MenuSection();
+                selectedMenu.sections[sectionNum] = section;
             }
 
-            //Create the sections for that menu
+            if (!section.sectionRecipeNames.Contains(recipeName))
+                section.sectionRecipeNames.Add(recipeName);
+        }
 
+
+        public Dictionary<int, MenuSection> GrabSectionList()
+        {
+            return selectedMenu?.sections;
         }
     }
 
-    
+
+
+
+
+
+
 
     public class Recipe
     {
@@ -170,6 +161,32 @@ namespace Inventory_Manager
             {
                 stockTextBox.AppendText($"{item.Name}: {item.Quantity} {item.Unit}{Environment.NewLine}");
             }
+        }
+
+        private readonly List<int> recipeStartIndices = new List<int>();
+        private readonly List<int> recipeItemCounts = new List<int>();
+        public Recipe FindRecipe(int index)
+        {
+            if (index < 0) return null;
+
+            int clickedIndex = index;
+
+            // find which recipe the clicked index belongs to
+            int recipeIndex = -1;
+            for (int i = 0; i < recipeStartIndices.Count; i++)
+            {
+                int start = recipeStartIndices[i];
+                int count = recipeItemCounts[i];
+                if (clickedIndex >= start && clickedIndex < start + count)
+                {
+                    recipeIndex = i;
+                    break;
+                }
+            }
+
+            if (recipeIndex < 0) return null;
+            //The selected Recipe
+            return Program.recipes[recipeIndex];
         }
 
         
