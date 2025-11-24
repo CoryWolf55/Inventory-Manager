@@ -12,7 +12,9 @@
 
 # \- Create and manage recipes made from stored ingredients
 
-# \- Data persistence using `.txt` files
+# \- Create Menus and schedules for planning
+
+# \- Data persistence using SQlite and Dapper
 
 # \- Simple and user-friendly Windows Forms interface
 
@@ -35,6 +37,7 @@
 # \- .NET WinForms  
 
 # \- System.IO / System. Text  
+# \- SQL
 
 # 
 
