@@ -105,7 +105,7 @@
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(205, 23);
             this.button4.TabIndex = 5;
-            this.button4.Text = "Edit";
+            this.button4.Text = "Remove";
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
@@ -152,7 +152,7 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(205, 23);
             this.button3.TabIndex = 4;
-            this.button3.Text = "Edit";
+            this.button3.Text = "Remove";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -199,7 +199,7 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(205, 23);
             this.button2.TabIndex = 3;
-            this.button2.Text = "Edit";
+            this.button2.Text = "Remove";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
@@ -246,7 +246,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(205, 23);
             this.button1.TabIndex = 2;
-            this.button1.Text = "Edit";
+            this.button1.Text = "Remove";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -280,16 +280,16 @@
             // listBox5
             // 
             this.listBox5.FormattingEnabled = true;
-            this.listBox5.Location = new System.Drawing.Point(4, 503);
+            this.listBox5.Location = new System.Drawing.Point(18, 205);
             this.listBox5.Name = "listBox5";
-            this.listBox5.Size = new System.Drawing.Size(189, 277);
+            this.listBox5.Size = new System.Drawing.Size(227, 238);
             this.listBox5.TabIndex = 4;
             this.listBox5.SelectedIndexChanged += new System.EventHandler(this.listBox5_SelectedIndexChanged);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 487);
+            this.label5.Location = new System.Drawing.Point(15, 189);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(71, 13);
             this.label5.TabIndex = 3;
@@ -298,15 +298,15 @@
             // listBox6
             // 
             this.listBox6.FormattingEnabled = true;
-            this.listBox6.Location = new System.Drawing.Point(18, 231);
+            this.listBox6.Location = new System.Drawing.Point(400, 532);
             this.listBox6.Name = "listBox6";
-            this.listBox6.Size = new System.Drawing.Size(227, 186);
+            this.listBox6.Size = new System.Drawing.Size(189, 238);
             this.listBox6.TabIndex = 4;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(18, 212);
+            this.label6.Location = new System.Drawing.Point(414, 508);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(75, 13);
             this.label6.TabIndex = 5;
@@ -318,7 +318,7 @@
             this.panel10.Controls.Add(this.button5);
             this.panel10.Controls.Add(this.Section);
             this.panel10.Controls.Add(this.comboBox1);
-            this.panel10.Location = new System.Drawing.Point(195, 503);
+            this.panel10.Location = new System.Drawing.Point(18, 449);
             this.panel10.Name = "panel10";
             this.panel10.Size = new System.Drawing.Size(125, 104);
             this.panel10.TabIndex = 6;

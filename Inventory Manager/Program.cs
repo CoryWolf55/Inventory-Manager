@@ -111,6 +111,16 @@ namespace Inventory_Manager
                 section.sectionRecipeNames.Add(recipeName);
         }
 
+        public void RemoveFromSection(int sectionNum, string recipeName)
+        {
+            if (selectedMenu == null)
+                throw new InvalidOperationException("No menu selected. Call SelectedDate() first.");
+            if (selectedMenu.sections.TryGetValue(sectionNum, out var section))
+            {
+                section.sectionRecipeNames.Remove(recipeName);
+            }
+        }
+
 
         public Dictionary<int, MenuSection> GrabSectionList()
         {

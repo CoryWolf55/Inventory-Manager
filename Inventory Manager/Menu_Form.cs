@@ -98,6 +98,8 @@ namespace Inventory_Manager
 
             MenuManager.Instance.AddToSection(selectedSection, recipe.Name);
             UpdateListBoxes();
+            listBox5.ClearSelected();
+            comboBox1.DroppedDown = false;
         }
 
 
@@ -135,22 +137,37 @@ namespace Inventory_Manager
         //Edit buttons
         private void button1_Click(object sender, EventArgs e)
         {
-
+            //edit button for section 1
+            RemoveFromSection(1, listBox1);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-
+            //edit button for section 2
+            RemoveFromSection(2, listBox2);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-
+            //edit button for section 3
+            RemoveFromSection(3, listBox3);
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
+            //edit button for section 4
+            RemoveFromSection(4, listBox4);
+        }
 
+        private void RemoveFromSection(int sectionNumber, ListBox box)
+        {
+            if (box.SelectedIndex < 0)
+                return;
+
+            string recipeName = box.SelectedItem.ToString();
+
+            MenuManager.Instance.RemoveFromSection(sectionNumber, recipeName);
+            UpdateListBoxes();
         }
     }
 
