@@ -181,91 +181,86 @@ namespace Inventory_Manager
 
         private void ChangeStock()
         {
-            
-            
-
             string input = textBox2.Text?.Trim() ?? string.Empty;
             if (string.IsNullOrEmpty(input))
                 return;
 
-            int numberToRemove = 0;
-            if (!int.TryParse(input, out numberToRemove) || numberToRemove <= 0)
+            // Use double to support fractional quantities
+            if (!double.TryParse(input, out double numberToRemove) || numberToRemove <= 0)
             {
-                MessageBox.Show("Please enter a number", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please enter a valid number", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            //Clear now that we have the number
+
+            // Clear input box
             textBox2.Clear();
 
+            // Helper function to remove stock from a single item
+            void RemoveFromItem(InventoryItem item, string sourceUnit)
+            {
+                if (string.IsNullOrWhiteSpace(item.Unit) && string.IsNullOrWhiteSpace(sourceUnit))  
+                {
+                    // Convert removal amount into item's unit
+                    double converted = InventoryManager.Instance.ConvertTo(numberToRemove, sourceUnit, item.Unit);
+                    item.Quantity -= converted;
+                }
+                else
+                {
+                    // No units → simple subtraction
+                    item.Quantity -= numberToRemove;
+                }
+
+                if (item.Quantity < 0) item.Quantity = 0;
+
+                // Auto-convert to best unit for display
+                if (item.Unit != null)
+                {
+                    var final = InventoryManager.Instance.UnitConversion(item.Quantity, item.Unit);
+                    item.Quantity = final.Key;
+                    item.Unit = final.Value;
+                }
+
+                // Warn if out of stock
+                if (item.Quantity == 0)
+                {
+                    MessageBox.Show($"Ingredient {item.Name} has run out of stock!", "Out of Stock", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+
+            // Case 1: removing from a single selected ingredient
             if (selectedIngredient != null)
             {
-                foreach(InventoryItem item in Program.inventory)
+                var item = Program.inventory.FirstOrDefault(i =>
+                    string.Equals(i.Name, selectedIngredient.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (item != null)
                 {
-                    if (item.Name == selectedIngredient.Name)
-                    {
-                        if(item.Quantity >= numberToRemove)
-                        {
-                            item.Quantity -= numberToRemove;
-                        }
-                        break;
-                    }
+                    RemoveFromItem(item, selectedIngredient.Unit);
+                    SqliteDataAccess.SaveInventory();
+                    UpdateText();
                 }
-
-                SqliteDataAccess.SaveInventory();
-                UpdateText();
-
                 return;
             }
-            
 
-                // Remove stock from selected ingredients
-               List<RecipeIngredient> ingredientsFound = new List<RecipeIngredient>();
+            // Case 2: removing from a recipe's ingredients
             foreach (RecipeIngredient ingredient in selectedRecipe.Ingredients)
-            {   
-                bool foundItemInInventory = false;
-                foreach (InventoryItem item in Program.inventory)
+            {
+                var item = Program.inventory.FirstOrDefault(i =>
+                    string.Equals(i.Name, ingredient.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (item != null)
                 {
-                    if (item.Name == ingredient.Name)
-                    {
-                        foundItemInInventory = true;
-                        ingredientsFound.Add(ingredient);
-                        if (item.Quantity >= numberToRemove)
-                        {
-                            item.Quantity -= numberToRemove;
-                        }
-                        if(item.Quantity <= 0)
-                        {
-                            item.Quantity = 0;
-                            MessageBox.Show($"Ingredient {item.Name} has run out of stock!", "Out of Stock", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        }
-                        break;
-                    }
+                    RemoveFromItem(item, ingredient.Unit);
                 }
-                if(foundItemInInventory == false)
+                else
                 {
-                    //Didnt find this item in the inventory
                     MessageBox.Show($"Ingredient {ingredient.Name} not found in inventory. No stock removed for this item.", "Ingredient Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
-
-            }
-            //Check for ingredients not found
-            foreach (RecipeIngredient ing in ingredientsFound)
-            {
-                foreach (RecipeIngredient ingredient in selectedRecipe.Ingredients)
-                {
-                    if(ing.Name != ingredient.Name)
-                    {
-                        //Didnt find this item in the list
-                        MessageBox.Show($"Ingredient {ingredient.Name} not found in inventory. No stock removed for this item.", "Ingredient Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-                }
             }
 
-
+            // Save and update UI
             SqliteDataAccess.SaveInventory();
             UpdateText();
-
-
         }
 
         private void UpdateText()

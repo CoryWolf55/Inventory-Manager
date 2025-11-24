@@ -80,11 +80,43 @@ namespace Inventory_Manager
             // Update the program-wide inventory: replace by name or add new
             foreach (var newItem in inventoryItems)
             {
-                int idx = Program.inventory.FindIndex(r => string.Equals(r.Name, newItem.Name, StringComparison.OrdinalIgnoreCase));
+                int idx = Program.inventory.FindIndex(r =>
+                    string.Equals(r.Name, newItem.Name, StringComparison.OrdinalIgnoreCase));
+
                 if (idx >= 0)
-                    Program.inventory[idx] = newItem;
+                {
+                    var existing = Program.inventory[idx];
+                    if (string.IsNullOrWhiteSpace(existing.Unit) && string.IsNullOrWhiteSpace(newItem.Unit))
+                    {
+                        Program.inventory.Add(newItem);
+                        continue;
+                    }
+                    else if(string.IsNullOrWhiteSpace(existing.Unit) || string.IsNullOrWhiteSpace(newItem.Unit))
+                    {
+                        Program.inventory[idx] = newItem;
+                        continue;
+                    }
+
+                    // Convert newItem to existing item's unit BEFORE adding
+                    double convertedAmount = InventoryManager.Instance.ConvertTo(
+                        newItem.Quantity,
+                        newItem.Unit,
+                        existing.Unit
+                    );
+
+                    // Add correctly
+                    existing.Quantity += convertedAmount;
+
+                    // Optional: convert to best unit
+                    var final = InventoryManager.Instance.UnitConversion(existing.Quantity, existing.Unit);
+                    existing.Quantity = final.Key;
+                    existing.Unit = final.Value;
+                }
                 else
+                {
+                    // Item doesn't exist → add it normally
                     Program.inventory.Add(newItem);
+                }
             }
 
             // Persist inventory to disk

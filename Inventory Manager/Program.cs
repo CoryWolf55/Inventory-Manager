@@ -232,9 +232,66 @@ namespace Inventory_Manager
             return Program.recipes[recipeIndex];
         }
 
-        
+        List<string> weightOrder = new List<string> { "g", "kg", "lb" };
+        List<string> volumeOrder = new List<string> { "ml", "l" };
+        Dictionary<string, float> toBase = new Dictionary<string, float>
+        {       
+            { "g", 1f },
+            { "kg", 1000f },
+            { "oz", 28.3495f },
+            { "lb", 453.592f },
+
+            { "ml", 1f },
+            { "l", 1000f },
+
+            { "pcs", 1f }
+        };
+        public KeyValuePair<double, string> UnitConversion(double amount, string unit)
+        {
+            if (unit == "pcs" || amount == 0)
+                return new KeyValuePair<double, string>(amount, unit);
+
+            // Determine category
+            bool isWeight = unit == "g" || unit == "kg" || unit == "oz" || unit == "lb";
+            bool isVolume = unit == "ml" || unit == "l";
+
+            // Pick order list
+            var order = isWeight ? weightOrder : volumeOrder;
+
+            // Convert to base unit
+            double baseValue = amount * toBase[unit];
+
+            // Find best unit to display
+            string bestUnit = unit;
+            double bestValue = amount;
+
+            foreach (string u in order)
+            {
+                double value = baseValue / toBase[u];
+                if (value >= 1 && value < 1000)
+                {
+                    bestUnit = u;
+                    bestValue = value;
+                }
+            }
+
+            return new KeyValuePair<double, string>(bestValue, bestUnit);
+        }
+
+        public double ConvertTo(double amount, string fromUnit, string toUnit)
+        {
+
+            if (fromUnit == "pcs" || toUnit == "pcs")
+                return amount;
+
+            double baseValue = amount * toBase[fromUnit];
+            return baseValue / toBase[toUnit];
+        }
+
+
+
     }
 
-   
-    
+
+
 }
