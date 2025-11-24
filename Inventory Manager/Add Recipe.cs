@@ -85,7 +85,7 @@ namespace Inventory_Manager
                 Program.recipes.Add(recipe);
 
             // Save once (writes the full list)
-            SaveData.Instance.SaveFile();
+            SqliteDataAccess.SaveRecipes();
 
             // Refresh UI view and clear inputs
             WriteSavedRecipes();
@@ -95,13 +95,33 @@ namespace Inventory_Manager
 
         private void WriteSavedRecipes()
         {
-            if (LoadText("RecipeSave.txt") != "No saved recipes yet.")
-                textBox2.Text = LoadText("RecipeSave.txt");
+            if (Program.recipes.Count == 0)
+            {
+                textBox2.Text = "No saved recipes yet.";
+                return;
+            }
+
+            // Build a string representation from the in-memory list
+            var sb = new System.Text.StringBuilder();
+            foreach (var recipe in Program.recipes)
+            {
+                sb.AppendLine($"Recipe: {recipe.Name}");
+                if (recipe.Ingredients != null)
+                {
+                    foreach (var ing in recipe.Ingredients)
+                    {
+                        sb.AppendLine($" - {ing.Name}, {ing.Quantity} {ing.Unit}");
+                    }
+                }
+                sb.AppendLine();
+            }
+
+            textBox2.Text = sb.ToString();
         }
 
-        
 
-       
+
+
         private string LoadText(string file)
         {
             string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -170,7 +190,7 @@ namespace Inventory_Manager
                 textBox1.Clear();
                 dataGridView1.Rows.Clear();
                 textBox3.Clear();
-                SaveData.ClearSavedRecipes();
+                SqliteDataAccess.ClearRecipes();
                 textBox2.Text = "No saved recipes yet.";
             }
         }

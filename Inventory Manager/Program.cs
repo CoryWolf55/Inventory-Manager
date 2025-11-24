@@ -21,6 +21,7 @@ namespace Inventory_Manager
         public static List<Recipe> recipes { get; set; } = new List<Recipe>();
         public static Dictionary<DateTime, Menu> scheduleMenu { get; set; } = 
             new Dictionary<DateTime, Menu>();
+        public static List<InventoryItem> inventory { get; set; } = new List<InventoryItem>();
         public static Dictionary<int, string> eatingTimes { get; set; } = new Dictionary<int, string>
         {
             {1,"Breakfast"},
@@ -28,17 +29,15 @@ namespace Inventory_Manager
             {3,"Dinner"},
             {4,"Dessert"},
         };
-
-
-        public static List<InventoryItem> inventory { get; set; } = new List<InventoryItem>();
         public readonly static string[] units = new[] { "g", "kg", "oz", "lb", "ml", "l", "pcs" };
 
         [STAThread]
         static void Main()
         {
             // Load main lists BEFORE creating forms so all saves use the same in-memory lists
-            recipes = SaveData.Instance.LoadFromFile();
-            inventory = SaveData.Instance.LoadInventoryFromFile();
+            recipes = SqliteDataAccess.LoadRecipes();
+            inventory = SqliteDataAccess.LoadInventory();
+            SqliteDataAccess.LoadScheduleMenu(); //Updates list through function
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -46,35 +45,48 @@ namespace Inventory_Manager
         }
     }
 
+    public class Recipe
+    {
+        public int ID { get; set; }             
+        public string Name { get; set; }
+        public List<RecipeIngredient> Ingredients { get; set; } = new List<RecipeIngredient>(); // initialize list to avoid nulls
+    }
+
+
     public class InventoryItem
     {
+        public int ID { get; set; }             
         public string Name { get; set; }
         public double Quantity { get; set; }
         public string Unit { get; set; }
     }
+
     public class RecipeIngredient
     {
+        public int ID { get; set; }               
+        public int RecipeId { get; set; }         
         public string Name { get; set; }
         public double Quantity { get; set; }
         public string Unit { get; set; }
     }
+
 
     public class Menu
     {
-        public Dictionary<int, MenuSection> sections = new Dictionary<int, MenuSection>();
-        public int dateAsInt;
+        public int DateAsInt { get; set; }  
+        public Dictionary<int, MenuSection> sections { get; set; } = new Dictionary<int, MenuSection>();
+
+        public Menu() { } 
 
         public Menu(DateTime time)
         {
-            dateAsInt = int.Parse(time.ToString("yyyyMMdd"));
+            DateAsInt = int.Parse(time.ToString("yyyyMMdd"));
         }
     }
 
-
     public class MenuSection
     {
-        public List<string> sectionRecipeNames = new List<string>();
-
+        public List<string> sectionRecipeNames { get; set; } = new List<string>();
     }
 
     //Schedule has key for dates and the menu that corresponds.
@@ -83,23 +95,33 @@ namespace Inventory_Manager
     public class MenuManager
     {
         public static readonly MenuManager Instance = new MenuManager();
-        public static Menu selectedMenu = null;
+        public Menu selectedMenu = null;
 
+        private MenuManager() { }
+
+        // Normalize DateTime to only year/month/day
+        private DateTime NormalizeDate(DateTime dt) => dt.Date;
+
+        // Select a date and ensure it exists in schedule
         public void SelectedDate(DateTime date)
         {
-            if (!Program.scheduleMenu.TryGetValue(date, out selectedMenu))
+            DateTime normDate = NormalizeDate(date);
+
+            if (!Program.scheduleMenu.TryGetValue(normDate, out selectedMenu))
             {
-                selectedMenu = new Menu(date);
-                Program.scheduleMenu[date] = selectedMenu;
+                selectedMenu = new Menu(normDate);
+                Program.scheduleMenu[normDate] = selectedMenu;
             }
         }
 
+        // Add a recipe to a section
         public void AddToSection(int sectionNum, string recipeName)
         {
             if (selectedMenu == null)
                 throw new InvalidOperationException("No menu selected. Call SelectedDate() first.");
 
-            if (!Program.eatingTimes.ContainsKey(sectionNum)) return;
+            if (!Program.eatingTimes.ContainsKey(sectionNum))
+                return;
 
             if (!selectedMenu.sections.TryGetValue(sectionNum, out var section))
             {
@@ -109,37 +131,48 @@ namespace Inventory_Manager
 
             if (!section.sectionRecipeNames.Contains(recipeName))
                 section.sectionRecipeNames.Add(recipeName);
+
+            // Update dictionary with normalized key
+            Program.scheduleMenu[NormalizeDate(selectedMenu.DateAsIntAsDate())] = selectedMenu;
+
+            SqliteDataAccess.SaveScheduleMenu();
         }
 
+        // Remove a recipe from a section
         public void RemoveFromSection(int sectionNum, string recipeName)
         {
             if (selectedMenu == null)
                 throw new InvalidOperationException("No menu selected. Call SelectedDate() first.");
+
             if (selectedMenu.sections.TryGetValue(sectionNum, out var section))
             {
                 section.sectionRecipeNames.Remove(recipeName);
             }
+
+            Program.scheduleMenu[NormalizeDate(selectedMenu.DateAsIntAsDate())] = selectedMenu;
+
+            SqliteDataAccess.SaveScheduleMenu();
         }
 
-
+        // Get all sections for selected menu
         public Dictionary<int, MenuSection> GrabSectionList()
         {
             return selectedMenu?.sections;
         }
     }
 
-
-
-
-
-
-
-
-    public class Recipe
+    // Helper extension
+    public static class MenuExtensions
     {
-        public string Name { get; set; }
-        public List<RecipeIngredient> Ingredients { get; set; }
+        public static DateTime DateAsIntAsDate(this Menu menu)
+        {
+            return new DateTime(menu.DateAsInt / 10000, (menu.DateAsInt / 100) % 100, menu.DateAsInt % 100);
+        }
     }
+
+
+
+
 
     public class  InventoryManager
     {
@@ -202,307 +235,6 @@ namespace Inventory_Manager
         
     }
 
-    public sealed class SaveData
-    {
-        // Singleton instance (eager initialization)
-        public static readonly SaveData Instance = new SaveData();
-
-        // Prevent external construction
-        private SaveData() { }
-
-        /// <summary>
-        /// Save the current recipes list to %AppData%\RecipeSave.txt
-        /// Format:
-        /// Recipe: &lt;Name&gt;
-        ///  - &lt;IngredientName&gt;, &lt;Quantity&gt; &lt;Unit&gt;
-        /// (blank line between recipes)
-        /// </summary>
-        public void SaveFile()
-        {
-            try
-            {
-                string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                Directory.CreateDirectory(folderPath);
-                string filePath = Path.Combine(folderPath, "RecipeSave.txt");
-
-                var lines = new List<string>();
-
-                // use the up-to-date program-wide list
-                var listToSave = Program.recipes ?? new List<Recipe>();
-
-                foreach (var recipe in listToSave)
-                {
-                    lines.Add($"Recipe: {recipe?.Name ?? string.Empty}");
-
-                    if (recipe?.Ingredients != null)
-                    {
-                        foreach (var ing in recipe.Ingredients)
-                        {
-                            string name = ing?.Name ?? string.Empty;
-                            string qty = (ing != null) ? ing.Quantity.ToString(System.Globalization.CultureInfo.InvariantCulture) : "0";
-                            string unit = (ing != null && !string.IsNullOrWhiteSpace(ing.Unit)) ? ing.Unit : string.Empty;
-                            lines.Add($" - {name}, {qty} {unit}".TrimEnd());
-                        }
-                    }
-
-                    lines.Add(string.Empty); // blank separator
-                }
-
-                File.WriteAllLines(filePath, lines);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to save recipes: " + ex.Message, "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// Load the save file and populate the provided target list.
-        /// Existing contents of target will be cleared.
-        /// </summary>
-        public void LoadInto(List<Recipe> target)
-        {
-            if (target == null) throw new ArgumentNullException(nameof(target));
-
-            string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string filePath = Path.Combine(folderPath, "RecipeSave.txt");
-
-            target.Clear();
-
-            if (!File.Exists(filePath))
-                return;
-
-            try
-            {
-                var lines = File.ReadAllLines(filePath);
-                Recipe current = null;
-
-                foreach (var raw in lines)
-                {
-                    if (string.IsNullOrWhiteSpace(raw))
-                    {
-                        current = null;
-                        continue;
-                    }
-
-                    var line = raw.Trim();
-
-                    if (line.StartsWith("Recipe:", StringComparison.OrdinalIgnoreCase))
-                    {
-                        string name = line.Substring("Recipe:".Length).Trim();
-                        current = new Recipe { Name = name, Ingredients = new List<RecipeIngredient>() };
-                        target.Add(current);
-                    }
-                    else if (line.StartsWith("-") || line.StartsWith(" -"))
-                    {
-                        // normalize and remove leading dash
-                        string content = line.StartsWith("-") ? line.Substring(1).Trim() : line.Substring(2).Trim();
-
-                        int commaIndex = content.IndexOf(',');
-                        if (commaIndex >= 0)
-                        {
-                            string ingName = content.Substring(0, commaIndex).Trim();
-                            string rest = content.Substring(commaIndex + 1).Trim(); // e.g. "100 g"
-
-                            double qty = 0;
-                            string unit = string.Empty;
-
-                            if (!string.IsNullOrEmpty(rest))
-                            {
-                                var tokens = rest.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                if (tokens.Length >= 1)
-                                {
-                                    // try invariant first, then current culture
-                                    if (!double.TryParse(tokens[0], NumberStyles.Float, CultureInfo.InvariantCulture, out qty))
-                                    {
-                                        double.TryParse(tokens[0], NumberStyles.Float, CultureInfo.CurrentCulture, out qty);
-                                    }
-                                }
-
-                                if (tokens.Length > 1)
-                                    unit = string.Join(" ", tokens, 1, tokens.Length - 1);
-                            }
-
-                            if (current != null)
-                            {
-                                current.Ingredients.Add(new RecipeIngredient
-                                {
-                                    Name = ingName,
-                                    Quantity = qty,
-                                    Unit = unit
-                                });
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // unknown line format - ignore
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to load recipes: " + ex.Message, "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// Convenience: returns a new list loaded from the save file.
-        /// </summary>
-        public List<Recipe> LoadFromFile()
-        {
-            var result = new List<Recipe>();
-            LoadInto(result);
-            return result;
-        }
-
-        /// <summary>
-        /// Save the current inventory list to %AppData%\InventorySave.txt
-        /// Format:
-        /// Item: &lt;Name&gt;
-        ///  - &lt;Quantity&gt; &lt;Unit&gt;
-        /// (blank line between items)
-        /// </summary>
-        public void SaveInventory()
-        {
-            try
-            {
-                string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                Directory.CreateDirectory(folderPath);
-                string filePath = Path.Combine(folderPath, "InventorySave.txt");
-
-                var lines = new List<string>();
-                var listToSave = Program.inventory ?? new List<InventoryItem>();
-
-                foreach (var item in listToSave)
-                {
-                    lines.Add($"Item: {item?.Name ?? string.Empty}");
-                    string qty = (item != null) ? item.Quantity.ToString(CultureInfo.InvariantCulture) : "0";
-                    string unit = (item != null && !string.IsNullOrWhiteSpace(item.Unit)) ? item.Unit : string.Empty;
-                    lines.Add($" - {qty} {unit}".TrimEnd());
-                    lines.Add(string.Empty); // separator
-                }
-
-                File.WriteAllLines(filePath, lines);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to save inventory: " + ex.Message, "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// Load inventory from file into the provided target list.
-        /// </summary>
-        public void LoadInventoryInto(List<InventoryItem> target)
-        {
-            if (target == null) throw new ArgumentNullException(nameof(target));
-
-            string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string filePath = Path.Combine(folderPath, "InventorySave.txt");
-
-            target.Clear();
-
-            if (!File.Exists(filePath))
-                return;
-
-            try
-            {
-                var lines = File.ReadAllLines(filePath);
-                InventoryItem current = null;
-
-                foreach (var raw in lines)
-                {
-                    if (string.IsNullOrWhiteSpace(raw))
-                    {
-                        current = null;
-                        continue;
-                    }
-
-                    var line = raw.Trim();
-
-                    if (line.StartsWith("Item:", StringComparison.OrdinalIgnoreCase))
-                    {
-                        string name = line.Substring("Item:".Length).Trim();
-                        current = new InventoryItem { Name = name, Quantity = 0, Unit = string.Empty };
-                        target.Add(current);
-                    }
-                    else if (line.StartsWith("-") || line.StartsWith(" -"))
-                    {
-                        string content = line.StartsWith("-") ? line.Substring(1).Trim() : line.Substring(2).Trim();
-                        // content expected like "100 g" or "2 pcs"
-                        if (!string.IsNullOrEmpty(content))
-                        {
-                            var tokens = content.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            double qty = 0;
-                            string unit = string.Empty;
-                            if (tokens.Length >= 1)
-                            {
-                                if (!double.TryParse(tokens[0], NumberStyles.Float, CultureInfo.InvariantCulture, out qty))
-                                {
-                                    double.TryParse(tokens[0], NumberStyles.Float, CultureInfo.CurrentCulture, out qty);
-                                }
-                            }
-                            if (tokens.Length > 1)
-                                unit = string.Join(" ", tokens, 1, tokens.Length - 1);
-
-                            if (current != null)
-                            {
-                                current.Quantity = qty;
-                                current.Unit = unit;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // unknown line - ignore
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to load inventory: " + ex.Message, "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// Convenience: returns a new list loaded from the inventory save file.
-        /// </summary>
-        public List<InventoryItem> LoadInventoryFromFile()
-        {
-            var result = new List<InventoryItem>();
-            LoadInventoryInto(result);
-            return result;
-        }
-
-        /// <summary>
-        /// Clear the in-memory recipes and remove the save file.
-        /// Use the instance method to ensure the in-memory list is updated.
-        /// </summary>
-        public void ClearAll()
-        {
-            // clear in-memory list used by the app
-            if (Program.recipes != null)
-                Program.recipes.Clear();
-
-            // delete the on-disk file
-            string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string filePath = Path.Combine(folderPath, "RecipeSave.txt");
-            try
-            {
-                if (File.Exists(filePath))
-                    File.Delete(filePath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to delete save file: " + ex.Message, "Delete Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        // Static wrapper kept for compatibility with existing callers
-        public static void ClearSavedRecipes()
-        {
-            Instance.ClearAll();
-        }
-    }
+   
+    
 }

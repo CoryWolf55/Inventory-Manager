@@ -27,3 +27,15 @@ C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\obj\De
 C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\obj\Debug\Inventory Manager.csproj.CoreCompileInputs.cache
 C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\obj\Debug\Inventory Manager.exe
 C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\obj\Debug\Inventory Manager.pdb
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\SaveDB.db
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\Dapper.dll
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\System.Data.SQLite.dll
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\Dapper.xml
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\System.Data.SQLite.xml
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\obj\Debug\Inventor.0664E1D2.Up2Date

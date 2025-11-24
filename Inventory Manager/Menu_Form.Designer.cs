@@ -134,7 +134,7 @@
             this.listBox4.Name = "listBox4";
             this.listBox4.Size = new System.Drawing.Size(205, 355);
             this.listBox4.TabIndex = 3;
-            this.listBox4.SelectedIndexChanged += new System.EventHandler(this.listBox4_SelectedIndexChanged);
+           
             // 
             // panel4
             // 
@@ -181,7 +181,7 @@
             this.listBox3.Name = "listBox3";
             this.listBox3.Size = new System.Drawing.Size(205, 355);
             this.listBox3.TabIndex = 2;
-            this.listBox3.SelectedIndexChanged += new System.EventHandler(this.listBox3_SelectedIndexChanged);
+          
             // 
             // panel3
             // 
@@ -228,7 +228,7 @@
             this.listBox2.Name = "listBox2";
             this.listBox2.Size = new System.Drawing.Size(204, 355);
             this.listBox2.TabIndex = 2;
-            this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
+            
             // 
             // panel2
             // 
@@ -257,7 +257,7 @@
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(205, 355);
             this.listBox1.TabIndex = 1;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            
             // 
             // panel5
             // 
@@ -284,7 +284,7 @@
             this.listBox5.Name = "listBox5";
             this.listBox5.Size = new System.Drawing.Size(227, 238);
             this.listBox5.TabIndex = 4;
-            this.listBox5.SelectedIndexChanged += new System.EventHandler(this.listBox5_SelectedIndexChanged);
+           
             // 
             // label5
             // 
@@ -349,7 +349,7 @@
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(120, 21);
             this.comboBox1.TabIndex = 0;
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+           
             // 
             // Menu_Form
             // 

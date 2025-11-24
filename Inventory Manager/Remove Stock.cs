@@ -211,7 +211,7 @@ namespace Inventory_Manager
                     }
                 }
 
-                SaveData.Instance.SaveInventory();
+                SqliteDataAccess.SaveInventory();
                 UpdateText();
 
                 return;
@@ -262,7 +262,7 @@ namespace Inventory_Manager
             }
 
 
-            SaveData.Instance.SaveInventory();
+            SqliteDataAccess.SaveInventory();
             UpdateText();
 
 

@@ -88,7 +88,7 @@ namespace Inventory_Manager
             }
 
             // Persist inventory to disk
-            SaveData.Instance.SaveInventory();
+            SqliteDataAccess.SaveInventory();
 
             // Refresh UI view and clear inputs
             UpdateStock();
