@@ -10,8 +10,7 @@ using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Collections.Specialized.BitVector32;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
 
 namespace Inventory_Manager
 {
@@ -100,7 +99,7 @@ namespace Inventory_Manager
         private MenuManager() { }
 
         // Normalize DateTime to only year/month/day
-        private DateTime NormalizeDate(DateTime dt) => dt.Date;
+        public DateTime NormalizeDate(DateTime dt) => dt.Date;
 
         // Select a date and ensure it exists in schedule
         public void SelectedDate(DateTime date)
@@ -158,6 +157,10 @@ namespace Inventory_Manager
         public Dictionary<int, MenuSection> GrabSectionList()
         {
             return selectedMenu?.sections;
+        }
+        public Dictionary<int, MenuSection> GrabSectionList(Menu menu)
+        {
+            return menu?.sections;
         }
     }
 

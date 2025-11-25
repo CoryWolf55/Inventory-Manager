@@ -38,6 +38,8 @@ namespace Inventory_Manager
                         }
                     }
                 }
+
+
             }
 
             InventoryManager.Instance.UpdateCurrentStockDisplay(this.textBox1);
@@ -49,6 +51,14 @@ namespace Inventory_Manager
             foreach (var item in InventoryManager.Instance.GrabSuggestions())
             {
                 textBox2.AppendText($"{item.Name}{Environment.NewLine}");
+            }
+
+            //Fill menu suggestion box
+            if (textBox3 == null) return;
+            textBox3.Clear();
+            foreach (var item in NeededMenuItems(DateTime.Now))
+            {
+                textBox1.AppendText($"{item.Name}: {item.Quantity} {item.Unit}{Environment.NewLine}");
             }
 
         }
@@ -140,6 +150,61 @@ namespace Inventory_Manager
             }
         }
 
+        private List<InventoryItem> NeededMenuItems(DateTime time)
+        {
+            //Grab menu from time and find what stock is used that day
+            if(time == null) time = DateTime.Now;
+
+            time = MenuManager.Instance.NormalizeDate(time);
+            Menu selectedMenu;
+
+            if (!Program.scheduleMenu.TryGetValue(time, out selectedMenu))
+                return null;
+            
+            Dictionary<int, MenuSection> sections = MenuManager.Instance.GrabSectionList(selectedMenu);
+            List<string> recipeNames = new List<string>();
+            List<RecipeIngredient> ingredientList = new List<RecipeIngredient>();
+            List<InventoryItem> returnList = new List<InventoryItem>();
+            //To-do Add lists to a dictionary, name and item for easy search
+            //To-do show the whole weeks worth of inventory needed
+            foreach (var section in sections)
+            {
+                MenuSection val = section.Value;
+                if (val == null) continue;
+                recipeNames.AddRange(val.sectionRecipeNames);
+            }
+            foreach (var recipe in Program.recipes)
+            {
+                //Iterate through names and get recipeIngredient values
+                if(recipeNames.Contains(recipe.Name))
+                {
+                    ingredientList.AddRange(recipe.Ingredients);
+                }
+            }
+            foreach (var ing in ingredientList)
+            {
+                foreach (var item in Program.inventory)
+                {
+                    if (item.Name == ing.Name)
+                    {
+                        if (ing.Quantity > item.Quantity)
+                        {
+                            //We need to add stock
+                            InventoryItem localItem = item;
+                            localItem.Quantity -= ing.Quantity;
+                            returnList.Add(localItem);
+                        }
+                    }
+                }
+            }
+
+            //returnList now contains all needed items
+            //Compare list to inventory
+            
+           
+            return returnList;
+        }
+
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
@@ -151,6 +216,11 @@ namespace Inventory_Manager
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
         {
 
         }

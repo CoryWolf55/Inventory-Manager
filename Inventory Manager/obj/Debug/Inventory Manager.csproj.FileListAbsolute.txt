@@ -39,3 +39,29 @@ C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\De
 C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\Cory\source\repos\CoryWolf55\Inventory-Manager\Inventory Manager\obj\Debug\Inventor.0664E1D2.Up2Date
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory Manager.csproj.AssemblyReference.cache
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory_Manager.Add_Recipe.resources
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory_Manager.Add_Stock.resources
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory_Manager.Form1.resources
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory_Manager.Menu_Form.resources
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory_Manager.Properties.Resources.resources
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory_Manager.Remove_Stock.resources
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory Manager.csproj.GenerateResource.cache
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory Manager.csproj.CoreCompileInputs.cache
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory Manager.exe
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventory Manager.pdb
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\SaveDB.db
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\Inventory Manager.exe.config
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\Inventory Manager.exe
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\Inventory Manager.pdb
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\Dapper.dll
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\System.Data.SQLite.dll
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\Dapper.xml
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\System.Data.SQLite.xml
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\coryw\Documents\GitHub\Inventory-Manager\Inventory Manager\obj\Debug\Inventor.0664E1D2.Up2Date
