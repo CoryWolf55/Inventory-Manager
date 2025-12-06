@@ -56,7 +56,9 @@ namespace Inventory_Manager
             //Fill menu suggestion box
             if (textBox3 == null) return;
             textBox3.Clear();
-            foreach (var item in NeededMenuItems(DateTime.Now))
+            var neededItems = NeededMenuItems(DateTime.Now);
+            if(neededItems == null) return;
+            foreach (var item in neededItems)
             {
                 textBox1.AppendText($"{item.Name}: {item.Quantity} {item.Unit}{Environment.NewLine}");
             }
@@ -152,58 +154,99 @@ namespace Inventory_Manager
 
         private List<InventoryItem> NeededMenuItems(DateTime time)
         {
-            //Grab menu from time and find what stock is used that day
-            if(time == null) time = DateTime.Now;
+            // Use current time if null
+            if (time == null)
+                time = DateTime.Now;
 
             time = MenuManager.Instance.NormalizeDate(time);
-            Menu selectedMenu;
 
-            if (!Program.scheduleMenu.TryGetValue(time, out selectedMenu))
+            // Try to get menu for selected day
+            if (!Program.scheduleMenu.TryGetValue(time, out var selectedMenu))
                 return null;
-            
+
+            // SECTION LIST
             Dictionary<int, MenuSection> sections = MenuManager.Instance.GrabSectionList(selectedMenu);
+
             List<string> recipeNames = new List<string>();
-            List<RecipeIngredient> ingredientList = new List<RecipeIngredient>();
             List<InventoryItem> returnList = new List<InventoryItem>();
-            //To-do Add lists to a dictionary, name and item for easy search
-            //To-do show the whole weeks worth of inventory needed
-            foreach (var section in sections)
+
+            // Inventory indexed by item name
+            Dictionary<string, InventoryItem> items =
+                Program.inventory.ToDictionary(i => i.Name, i => i);
+
+            // Ingredient requirements indexed by ingredient name
+            Dictionary<string, RecipeIngredient> ingredientList = new Dictionary<string, RecipeIngredient>();
+
+
+            // Gather all recipe names used in this menu
+            foreach (var section in sections.Values)
             {
-                MenuSection val = section.Value;
-                if (val == null) continue;
-                recipeNames.AddRange(val.sectionRecipeNames);
+                if (section == null) continue;
+                recipeNames.AddRange(section.sectionRecipeNames);
             }
+
+
+            // Gather all ingredients for those recipes and COMBINE duplicates
             foreach (var recipe in Program.recipes)
             {
-                //Iterate through names and get recipeIngredient values
-                if(recipeNames.Contains(recipe.Name))
+                if (recipeNames.Contains(recipe.Name))
                 {
-                    ingredientList.AddRange(recipe.Ingredients);
-                }
-            }
-            foreach (var ing in ingredientList)
-            {
-                foreach (var item in Program.inventory)
-                {
-                    if (item.Name == ing.Name)
+                    foreach (var ing in recipe.Ingredients)
                     {
-                        if (ing.Quantity > item.Quantity)
+                        // If ingredient already exists, accumulate quantities
+                        if (ingredientList.TryGetValue(ing.Name, out var existing))
                         {
-                            //We need to add stock
-                            InventoryItem localItem = item;
-                            localItem.Quantity -= ing.Quantity;
-                            returnList.Add(localItem);
+                            existing.Quantity += ing.Quantity;
+                        }
+                        else
+                        {
+                            ingredientList.Add(ing.Name, new RecipeIngredient
+                            {
+                                Name = ing.Name,
+                                Quantity = ing.Quantity,
+                                Unit = ing.Unit
+                            });
                         }
                     }
                 }
             }
 
-            //returnList now contains all needed items
-            //Compare list to inventory
-            
-           
+            foreach (var pair in ingredientList)
+            {
+                string ingredientName = pair.Key;
+                RecipeIngredient needed = pair.Value;
+
+                // If item exists in inventory
+                if (items.TryGetValue(ingredientName, out var inv))
+                {
+                    double shortage = needed.Quantity - inv.Quantity;
+
+                    if (shortage > 0)
+                    {
+                        // Add only what you need to buy
+                        returnList.Add(new InventoryItem
+                        {
+                            Name = ingredientName,
+                            Unit = inv.Unit,
+                            Quantity = shortage
+                        });
+                    }
+                }
+                else
+                {
+                    // Ingredient not in inventory at all: need the full quantity
+                    returnList.Add(new InventoryItem
+                    {
+                        Name = ingredientName,
+                        Unit = needed.Unit,
+                        Quantity = needed.Quantity
+                    });
+                }
+            }
+
             return returnList;
         }
+
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {

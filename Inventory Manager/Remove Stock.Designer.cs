@@ -110,7 +110,6 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(119, 20);
             this.textBox2.TabIndex = 1;
-            
             // 
             // label3
             // 
@@ -137,7 +136,6 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(119, 20);
             this.textBox3.TabIndex = 1;
-            
             // 
             // label5
             // 
